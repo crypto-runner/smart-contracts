@@ -695,6 +695,7 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
 
     uint256 private constant MAX = ~uint256(0);
     uint256 private constant MIN_TX_AMOUNT = 100_000e9;
+    uint256 private constant MAX_FEE = 1500;
     uint256 internal _tokenTotal = 1_000_000_000_000e9;
     uint256 internal _reflectionTotal = (MAX - (MAX % _tokenTotal));
 
@@ -1066,37 +1067,39 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
         isFeeActive = value;
     }
 
+    function validateFee() view internal {
+        require(_taxFee[0] + _vaultFee[0] + _marketingFee[0] + _liqFee[0] <= MAX_FEE, "Buy Fee too high");
+        require(_taxFee[1] + _vaultFee[1] + _marketingFee[1] + _liqFee[1] <= MAX_FEE, "Sell Fee too high");
+        require(_taxFee[2] + _vaultFee[2] + _marketingFee[2] + _liqFee[2] <= MAX_FEE, "P2P Fee too high");
+    }
+
     function setTaxFee(uint256 buy, uint256 sell, uint256 p2p) external onlyOwner {
-        uint256 maxFee = 10**(_feeDecimal + 2) / 10; // 10%
-        require(buy <= maxFee && sell <= maxFee && p2p <= maxFee, "Fee cannot be greater than 10%");
         _taxFee[0] = buy;
         _taxFee[1] = sell;
         _taxFee[2] = p2p;
+        validateFee();
     }
 
     function setBNBVaultFee(uint256 buy, uint256 sell, uint256 p2p) external onlyOwner {
-        uint256 maxFee = 10**(_feeDecimal + 2) / 10;
-        require(buy <= maxFee && sell <= maxFee && p2p <= maxFee, "Fee cannot be greater than 10%");
         _vaultFee[0] = buy;
         _vaultFee[1] = sell;
         _vaultFee[2] = p2p;
+        validateFee();
     }
 
 
     function setMarketingFee(uint256 buy, uint256 sell, uint256 p2p) external onlyOwner {
-        uint256 maxFee = 10**(_feeDecimal + 2) / 10;
-        require(buy <= maxFee && sell <= maxFee && p2p <= maxFee, "Fee cannot be greater than 10%");
         _marketingFee[0] = buy;
         _marketingFee[1] = sell;
         _marketingFee[2] = p2p;
+        validateFee();
     }
 
     function setLiquidityFee(uint256 buy, uint256 sell, uint256 p2p) external onlyOwner {
-        uint256 maxFee = 10**(_feeDecimal + 2) / 10;
-        require(buy <= maxFee && sell <= maxFee && p2p <= maxFee, "Fee cannot be greater than 10%");
         _liqFee[0] = buy;
         _liqFee[1] = sell;
         _liqFee[2] = p2p;
+        validateFee();
     }
 
     function setMarketingWallet(address wallet) external onlyOwner {
