@@ -694,7 +694,7 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
     mapping(address => mapping(address => uint256)) internal _allowances;
 
     uint256 private constant MAX = ~uint256(0);
-    uint256 private constant MIN_TX_AMOUNT = 100_000e9;
+    uint256 private constant MAX_TX_AMOUNT_LIMIT = 100_000e9;
     uint256 private constant MAX_FEE = 1500;
     uint256 internal _tokenTotal = 1_000_000_000_000e9;
     uint256 internal _reflectionTotal = (MAX - (MAX % _tokenTotal));
@@ -1073,6 +1073,10 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
         require(_taxFee[2] + _vaultFee[2] + _marketingFee[2] + _liqFee[2] <= MAX_FEE, "P2P Fee too high");
     }
 
+    function increaseSwapAllowance() {
+        _approve(address(this), address(router), uint256(-1));
+    }
+
     function setTaxFee(uint256 buy, uint256 sell, uint256 p2p) external onlyOwner {
         _taxFee[0] = buy;
         _taxFee[1] = sell;
@@ -1113,7 +1117,7 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
 
     function setMaxTxAmountPercent(uint256 percentDecimals, uint256 percent) external onlyOwner {
         maxTxAmount = _tokenTotal.mul(percent).div(percentDecimals);
-        require(maxTxAmount >= MIN_TX_AMOUNT, "MaxTx amount is too low");
+        require(maxTxAmount >= MAX_TX_AMOUNT_LIMIT, "MaxTx amount is too low");
     }
 
     function setMinTokensBeforeSwap(uint256 amount) external onlyOwner {
