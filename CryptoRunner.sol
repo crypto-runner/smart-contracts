@@ -1073,7 +1073,7 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
         require(_taxFee[2] + _vaultFee[2] + _marketingFee[2] + _liqFee[2] <= MAX_FEE, "P2P Fee too high");
     }
 
-    function increaseSwapAllowance() {
+    function increaseSwapAllowance() external onlyOwner {
         _approve(address(this), address(router), uint256(-1));
     }
 
