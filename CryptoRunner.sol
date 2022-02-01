@@ -696,6 +696,7 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
     uint256 private constant MAX = ~uint256(0);
     uint256 private constant MAX_TX_AMOUNT_LIMIT = 100_000e9;
     uint256 private constant MAX_FEE = 1500;
+    uint256 private constant MAX_SWAP_PERCENT_LIMIT = 1000;
     uint256 internal _tokenTotal = 1_000_000_000_000e9;
     uint256 internal _reflectionTotal = (MAX - (MAX % _tokenTotal));
 
@@ -1125,6 +1126,7 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
     }
 
     function setMaxSwapPercent(uint256 percent) external onlyOwner {
+        require(percent <= MAX_SWAP_PERCENT_LIMIT, "max swap percent too high");
         maxSwapPercent = percent;
     }
 
