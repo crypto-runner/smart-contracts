@@ -1117,7 +1117,7 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
     }
 
     function setMaxTxAmountPercent(uint256 percentDecimals, uint256 percent) external onlyOwner {
-        maxTxAmount = _tokenTotal.mul(percent).div(percentDecimals);
+        maxTxAmount = _tokenTotal.mul(percent).div(10**percentDecimals);
         require(maxTxAmount >= MAX_TX_AMOUNT_LIMIT, "MaxTx amount is too low");
     }
 
@@ -1139,5 +1139,7 @@ contract CryptoRunner is Context, IERC20, Ownable, ReentrancyGuard {
         recipient.transfer(amount);
     }
 
-    receive() external payable {}
+    receive() external payable {
+        require(msg.sender == address(router), "Only router is allowed");
+    }
 }
